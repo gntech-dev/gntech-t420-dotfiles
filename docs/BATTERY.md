@@ -11,14 +11,14 @@ charge_control_end_threshold   = 100 [%]
 
 These are the driver's reported defaults, allowing a charge to 100%. Previously the hardware had 80/90 thresholds.
 
-## TLP configuration: verification pending
+## TLP configuration: verified
 
 Two TLP files previously had active 80/90 settings:
 
 - `/etc/tlp.d/10-battery.conf`
 - `/etc/tlp.d/99-gntech-battery.conf`
 
-Instructions were provided to back up both files and comment out `START_CHARGE_THRESH_BAT0` and `STOP_CHARGE_THRESH_BAT0`, but the user has **not yet provided the configuration-check output**. Do not assume TLP will preserve the new hardware state until verified.
+After commenting out the threshold settings, the user ran the configuration check and confirmed the exact output **`No active charging thresholds configured`** on 2026-10-24. No active START/STOP threshold entries were found in `/etc/tlp.conf` or `/etc/tlp.d/`. The hardware values 96/100 were separately verified. Persistence after a reboot has not yet been tested.
 
 Check on T420:
 
