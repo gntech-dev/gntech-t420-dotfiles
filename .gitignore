@@ -1,0 +1,18 @@
+# Never commit credentials or local state
+.ssh/
+**/id_*
+**/*.pem
+**/*.key
+**/*token*
+**/*secret*
+**/*password*
+*.log
+*.bak
+*.bak.*
+*.tar
+*.tar.gz
+.cache/
+.local/share/
+.env
+.env.*
+!.env.example
