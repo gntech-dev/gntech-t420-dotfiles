@@ -3,19 +3,21 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 mode="dry-run"
+configure_greetd=false
 install_packages=false
 restore_dotfiles=false
 
 usage() {
   cat <<'USAGE'
 GNTECH T420 Desktop Installer v0.1
-Usage: bash scripts/install.sh [--dry-run|--apply] [--packages] [--dotfiles]
+Usage: bash scripts/install.sh [--dry-run|--apply] [--packages] [--dotfiles] [--greetd]
 
 Defaults to dry-run, both components selected.
   --dry-run   Preview operations (default)
   --apply     Execute selected operations
   --packages  Install missing desktop packages
   --dotfiles  Restore exported dotfiles (backups created by restore script)
+  --greetd    Configure graphical greetd login (opt-in, rollback supported)
   --help      Show this help
 
 This installer does not partition disks, install a bootloader, or configure
@@ -29,13 +31,14 @@ while (($#)); do
     --apply) mode="apply" ;;
     --packages) install_packages=true ;;
     --dotfiles) restore_dotfiles=true ;;
+    --greetd) configure_greetd=true ;;
     --help|-h) usage; exit 0 ;;
     *) printf 'Unknown argument: %s\n' "$1" >&2; usage >&2; exit 2 ;;
   esac
   shift
 done
 
-if [[ "$install_packages" == false && "$restore_dotfiles" == false ]]; then
+if [[ "$install_packages" == false && "$restore_dotfiles" == false && "$configure_greetd" == false ]]; then
   install_packages=true
   restore_dotfiles=true
 fi
@@ -75,6 +78,9 @@ if [[ "$mode" == "dry-run" ]]; then
   if [[ "$restore_dotfiles" == true ]]; then
     bash "$repo_root/scripts/restore-dotfiles.sh" --dry-run
   fi
+  if [[ "$configure_greetd" == true ]]; then
+    bash "$repo_root/scripts/configure-greetd.sh" --dry-run --graphical
+  fi
   exit 0
 fi
 
@@ -83,5 +89,8 @@ if [[ "$install_packages" == true ]] && (("${#missing[@]}" > 0)); then
 fi
 if [[ "$restore_dotfiles" == true ]]; then
   bash "$repo_root/scripts/restore-dotfiles.sh" --apply
+fi
+if [[ "$configure_greetd" == true ]]; then
+  bash "$repo_root/scripts/configure-greetd.sh" --apply --graphical
 fi
 echo "GNTECH installer finished. Log out and back in if desktop settings changed."
