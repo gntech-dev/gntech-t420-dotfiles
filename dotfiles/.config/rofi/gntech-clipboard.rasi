@@ -1,0 +1,30 @@
+@theme "gntech-power"
+
+configuration {
+    font: "JetBrainsMono Nerd Font 10";
+}
+
+window {
+    width: 600px;
+}
+
+listview {
+    lines: 8;
+    columns: 1;
+}
+
+element {
+    padding: 10px;
+}
+
+element-text {
+    horizontal-align: 0.0;
+}
+
+element selected.normal {
+    background-color: #00d9ff;
+}
+
+element-text selected.normal {
+    text-color: #10141c;
+}

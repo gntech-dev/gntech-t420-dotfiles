@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+MODE="${1:-full}"
+DIR="$HOME/Pictures/Screenshots"
+FILE="$DIR/$(date +%Y-%m-%d_%H-%M-%S)_${MODE}.png"
+
+mkdir -p "$DIR"
+
+case "$MODE" in
+    full)
+        maim "$FILE"
+        ;;
+
+    region)
+        maim -s -l -c 0.0,0.85,1.0,0.35 -b 3 "$FILE"
+        ;;
+
+    window)
+        WINDOW=$(xdotool getactivewindow)
+        maim -i "$WINDOW" "$FILE"
+        ;;
+
+    clipboard)
+        maim -s -l -c 0.0,0.85,1.0,0.35 -b 3 | xclip -selection clipboard -t image/png
+        notify-send -i camera-photo \
+            "ARCH Screenshot" \
+            "Selected region copied to clipboard"
+        exit 0
+        ;;
+
+    *)
+        echo "Usage: $0 {full|region|window|clipboard}" >&2
+        exit 1
+        ;;
+esac
+
+notify-send -i camera-photo \
+    "ARCH Screenshot" \
+    "Saved: $(basename "$FILE")"
+
+echo "$FILE"

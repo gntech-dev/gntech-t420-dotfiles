@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+history="$HOME/.local/share/gntech/recent-folders"
+theme="$HOME/.config/rofi/gntech-files.rasi"
+
+if [[ ! -s "$history" ]]; then
+    notify-send "GNTECH Files" "No recent folders yet."
+    exit 0
+fi
+
+mapfile -t folders < <(
+    while IFS= read -r folder; do
+        [[ -d "$folder" ]] && printf '%s\n' "$folder"
+    done < "$history" | head -20
+)
+
+((${#folders[@]})) || exit 0
+
+selection=$(
+    printf '%s\n' "${folders[@]}" |
+    rofi -dmenu \
+        -i \
+        -p "GNTECH // FOLDERS" \
+        -theme "$theme" \
+        -format i \
+        -me-select-entry '' \
+        -me-accept-entry MousePrimary
+) || exit 0
+
+[[ "$selection" =~ ^[0-9]+$ ]] || exit 0
+(( selection < ${#folders[@]} )) || exit 0
+
+"$HOME/.local/bin/gntech-open-folder" \
+    "${folders[$selection]}"

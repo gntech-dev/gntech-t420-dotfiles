@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+temp=""
+
+# Prefer Intel CPU package temperature
+for sensor in /sys/class/hwmon/hwmon*; do
+    [[ -r "$sensor/name" ]] || continue
+    [[ $(cat "$sensor/name") == "coretemp" ]] || continue
+
+    for input in "$sensor"/temp*_input; do
+        [[ -r "$input" ]] || continue
+
+        label="${input%_input}_label"
+
+        if [[ -r "$label" ]] &&
+           [[ $(cat "$label") == "Package id 0" ]]; then
+            temp=$(cat "$input")
+            break
+        fi
+    done
+
+    [[ -n "$temp" ]] && break
+done
+
+# Fallback to a CPU thermal zone
+if [[ -z "$temp" ]]; then
+    for zone in /sys/class/thermal/thermal_zone*; do
+        [[ -r "$zone/type" && -r "$zone/temp" ]] || continue
+
+        case "$(cat "$zone/type")" in
+            x86_pkg_temp|cpu-thermal)
+                temp=$(cat "$zone/temp")
+                break
+                ;;
+        esac
+    done
+fi
+
+if [[ -z "$temp" ]]; then
+    echo "󰔏 N/A"
+    exit 0
+fi
+
+degrees=$((temp / 1000))
+
+if (( degrees >= 85 )); then
+    echo "%{F#ff5370}󰔏 ${degrees}°C%{F-}"
+elif (( degrees >= 70 )); then
+    echo "%{F#ffcb6b}󰔏 ${degrees}°C%{F-}"
+else
+    echo "%{F#00d9ff}󰔏 ${degrees}°C%{F-}"
+fi

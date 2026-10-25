@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+set -u
+
+THEME="$HOME/.config/rofi/gntech-files.rasi"
+
+declare -a devices=()
+declare -a labels=()
+
+# Identify USB disks, then enumerate their partitions.
+while IFS= read -r disk; do
+    [[ -b "$disk" ]] || continue
+
+    while IFS= read -r part; do
+        [[ -b "$part" ]] || continue
+
+        label=$(lsblk -dnro LABEL "$part")
+        size=$(lsblk -dnro SIZE "$part")
+
+        [[ -n "$label" ]] || label="${part##*/}"
+
+        devices+=("$part")
+        labels+=("󰕓  $label — $size ($part)")
+    done < <(lsblk -lnpo NAME,TYPE "$disk" |
+        awk '$2 == "part" {print $1}')
+
+done < <(lsblk -dnpo NAME,TRAN |
+    awk '$2 == "usb" {print $1}')
+
+if (( ${#devices[@]} == 0 )); then
+    notify-send "GNTECH USB" \
+        "No USB storage partitions detected."
+    exit 0
+fi
+
+selection=$(
+    printf '%s\n' "${labels[@]}" |
+    rofi -dmenu \
+        -i \
+        -p "GNTECH // USB" \
+        -theme "$THEME" \
+        -me-select-entry '' \
+        -me-accept-entry MousePrimary
+) || exit 0
+
+for i in "${!labels[@]}"; do
+    [[ "$selection" == "${labels[$i]}" ]] || continue
+
+    device="${devices[$i]}"
+
+    mountpoint=$(findmnt -rn -S "$device" -o TARGET | head -n 1)
+
+    if [[ -z "$mountpoint" ]]; then
+        if ! udisksctl mount -b "$device"; then
+            notify-send "GNTECH USB" \
+                "Unable to mount $device."
+            exit 1
+        fi
+
+        mountpoint=$(findmnt -rn -S "$device" -o TARGET | head -n 1)
+    fi
+
+    if [[ -n "$mountpoint" && -d "$mountpoint" ]]; then
+        thunar "$mountpoint" &
+    else
+        notify-send "GNTECH USB" \
+            "Mount point not found for $device."
+        exit 1
+    fi
+
+    exit 0
+done

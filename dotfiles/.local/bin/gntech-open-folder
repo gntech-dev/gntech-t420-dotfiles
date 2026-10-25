@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+folder="${1:-$HOME}"
+history="$HOME/.local/share/gntech/recent-folders"
+
+[[ -d "$folder" ]] || {
+    notify-send "GNTECH Files" "Folder not found."
+    exit 1
+}
+
+folder=$(realpath -- "$folder")
+
+mkdir -p "$(dirname "$history")"
+
+python - "$history" "$folder" <<'PY'
+import sys
+from pathlib import Path
+
+history = Path(sys.argv[1])
+folder = sys.argv[2]
+
+previous = (
+    history.read_text().splitlines()
+    if history.exists() else []
+)
+
+entries = [folder] + [
+    entry for entry in previous
+    if entry != folder and Path(entry).is_dir()
+]
+
+history.write_text(
+    "\n".join(entries[:30]) + "\n"
+)
+PY
+
+thunar "$folder" &

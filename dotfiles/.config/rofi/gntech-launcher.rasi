@@ -1,0 +1,121 @@
+configuration {
+    modi: "drun,run";
+    show-icons: true;
+    drun-display-format: "{name}";
+    font: "JetBrainsMono Nerd Font 10";
+    display-drun: "Applications";
+}
+
+* {
+    bg: #10141c;
+    bg-alt: #1c2635;
+    fg: #d6deeb;
+    cyan: #00d9ff;
+    muted: #8994a8;
+}
+
+window {
+    width: 650px;
+    location: center;
+    anchor: center;
+    background-color: @bg;
+    border: 2px;
+    border-color: @cyan;
+    border-radius: 10px;
+}
+
+mainbox {
+    padding: 18px;
+    spacing: 14px;
+    background-color: @bg;
+    children: [inputbar, listview];
+}
+
+inputbar {
+    padding: 12px;
+    spacing: 10px;
+    background-color: @bg-alt;
+    border-radius: 6px;
+    children: [prompt, entry];
+}
+
+prompt {
+    text-color: @cyan;
+    background-color: transparent;
+}
+
+entry {
+    placeholder: "Search applications...";
+    placeholder-color: @muted;
+    text-color: @fg;
+    background-color: transparent;
+    expand: true;
+}
+
+listview {
+    columns: 3;
+    lines: 3;
+    spacing: 10px;
+    fixed-height: true;
+    cycle: true;
+    scrollbar: false;
+    background-color: @bg;
+}
+
+element {
+    orientation: vertical;
+    padding: 12px;
+    spacing: 8px;
+    border-radius: 6px;
+    background-color: @bg-alt;
+}
+
+element-icon {
+    size: 32px;
+    horizontal-align: 0.5;
+    background-color: transparent;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    vertical-align: 0.5;
+    text-color: @fg;
+    background-color: transparent;
+}
+
+element selected.normal {
+    background-color: @cyan;
+}
+
+element-text selected.normal {
+    text-color: @bg;
+}
+
+/* GNTECH launcher refinements */
+window {
+    width: 780px;
+}
+
+listview {
+    columns: 3;
+    lines: 3;
+    spacing: 8px;
+}
+
+element {
+    padding: 10px;
+    spacing: 6px;
+}
+
+element-icon {
+    size: 28px;
+}
+
+element-text {
+    horizontal-align: 0.5;
+    text-color: #d6deeb;
+}
+
+element-text selected {
+    text-color: #10141c;
+}

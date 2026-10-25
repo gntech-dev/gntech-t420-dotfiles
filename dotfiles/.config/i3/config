@@ -1,0 +1,156 @@
+set $mod Mod4
+
+font pango:DejaVu Sans Mono 10
+
+# Terminal
+bindsym $mod+Return exec alacritty
+
+# Application launcher
+
+# Close window
+bindsym $mod+Shift+q kill
+
+# Workspaces
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+
+# Window navigation
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# Move windows
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Restart / exit
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec i3-msg exit
+
+# Status bar
+#bar {
+#    status_command i3status
+#}
+
+
+# ThinkPad T420 - Volume keys
+bindsym XF86AudioRaiseVolume exec --no-startup-id wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+
+bindsym XF86AudioLowerVolume exec --no-startup-id wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym XF86AudioMute exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym XF86AudioMicMute exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+
+# ThinkPad T420 - Brightness
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +5%
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 5%-
+# GNTECH Polybar
+exec_always --no-startup-id ~/.config/polybar/launch.sh
+
+
+
+
+# GNTECH Application Launcher
+
+# GNTECH - Window Appearance
+default_border pixel 2
+default_floating_border pixel 2
+
+gaps inner 8
+gaps outer 4
+
+# Focused: cyan
+client.focused          #00d9ff #10141c #d6deeb #00d9ff #00d9ff
+
+# Unfocused: dark gray
+client.unfocused        #273344 #10141c #748399 #273344 #273344
+
+# Inactive: dark blue
+client.focused_inactive #273344 #10141c #d6deeb #273344 #273344
+
+# Floating windows
+floating_modifier $mod
+
+# GNTECH - ChatGPT
+bindsym $mod+Shift+c exec --no-startup-id firefox --new-window https://chatgpt.com
+
+# =========================================
+# GNTECH - Cyberpunk Wallpaper Manager
+# =========================================
+
+# Restore wallpaper when i3 starts or reloads
+exec_always --no-startup-id ~/.local/bin/gntech-wallpaper restore
+
+# Next wallpaper
+bindsym $mod+Shift+w exec --no-startup-id ~/.local/bin/gntech-wallpaper next
+
+# Random wallpaper
+bindsym $mod+Ctrl+w exec --no-startup-id ~/.local/bin/gntech-wallpaper random
+
+# ==========================================
+# GNTECH - Lightweight Compositor
+# ==========================================
+exec --no-startup-id picom --config ~/.config/picom/picom.conf
+
+# GNTECH POWER MANAGEMENT BEGIN
+
+# Lock manually
+bindsym $mod+Ctrl+l exec --no-startup-id ~/.local/bin/gntech-lock
+
+# Suspend manually
+bindsym $mod+Shift+s exec --no-startup-id systemctl suspend
+
+# Lock on idle and before suspend
+
+# Lock after 5 minutes, display off after 10 minutes
+
+# GNTECH POWER MANAGEMENT END
+
+# GNTECH - Persistent idle locking
+exec_always --no-startup-id sh -c 'pgrep -x xss-lock >/dev/null || exec xss-lock --transfer-sleep-lock -- "$HOME/.local/bin/gntech-lock"'
+
+# X11 idle and display power management
+exec_always --no-startup-id xset s 300 300
+exec_always --no-startup-id xset +dpms
+exec_always --no-startup-id xset dpms 0 0 600
+
+# GNTECH - Notification Daemon
+exec --no-startup-id dunst
+
+# GNTECH Cyberpunk Application Launcher
+bindsym $mod+d exec --no-startup-id ~/.local/bin/gntech-launcher
+
+# ==================================================
+# ARCH / GNTECH - Screenshots
+# ==================================================
+
+bindsym Print exec --no-startup-id ~/.local/bin/gntech-screenshot full
+bindsym Shift+Print exec --no-startup-id ~/.local/bin/gntech-screenshot region
+bindsym Ctrl+Print exec --no-startup-id ~/.local/bin/gntech-screenshot window
+bindsym Ctrl+Shift+Print exec --no-startup-id ~/.local/bin/gntech-screenshot clipboard
+
+# ==================================================
+# ARCH / GNTECH - Clipboard History
+# ==================================================
+
+bindsym $mod+v exec --no-startup-id ~/.local/bin/gntech-clipboard
+
+exec --no-startup-id ~/.local/bin/gntech-clipboard-daemon
+
+
+# ==================================================
+# GNTECH - Thunar Desktop Integration
+# ==================================================
+
+bindsym $mod+e exec --no-startup-id thunar
+
+exec --no-startup-id sh -c 'pgrep -u "$(id -u)" -x udiskie >/dev/null || exec udiskie --config "$HOME/.config/udiskie/config.yml"'
+
+exec --no-startup-id sh -c 'pgrep -u "$(id -u)" -f "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1" >/dev/null || exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1'
+
+bindsym $mod+f exec --no-startup-id ~/.local/bin/gntech-quick-access
+
+bindsym $mod+Shift+f exec --no-startup-id ~/.local/bin/gntech-ssh-launcher

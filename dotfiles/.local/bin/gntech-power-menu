@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+THEME="$HOME/.config/rofi/gntech-power.rasi"
+
+choice=$(printf '%s\n' \
+    '󰌾  Lock' \
+    '󰤄  Suspend' \
+    '󰜉  Reboot' \
+    '󰐥  Shutdown' |
+    rofi -dmenu -p "GNTECH POWER" -theme "$THEME")
+
+case "$choice" in
+    *Lock)
+        "$HOME/.local/bin/gntech-lock"
+        ;;
+    *Suspend)
+        systemctl suspend
+        ;;
+    *Reboot)
+        confirm=$(printf 'No\nYes' |
+            rofi -dmenu -p "Confirm reboot?" -theme "$THEME")
+        [[ "$confirm" == "Yes" ]] && systemctl reboot
+        ;;
+    *Shutdown)
+        confirm=$(printf 'No\nYes' |
+            rofi -dmenu -p "Confirm shutdown?" -theme "$THEME")
+        [[ "$confirm" == "Yes" ]] && systemctl poweroff
+        ;;
+esac

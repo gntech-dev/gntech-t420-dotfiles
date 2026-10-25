@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+DIR="$HOME/Pictures/Wallpapers"
+STATE="$HOME/.cache/gntech-wallpaper"
+ACTION="${1:-next}"
+
+mapfile -d '' WALLPAPERS < <(
+    find "$DIR" -maxdepth 1 -type f \
+      \( -iname '*.jpg' -o -iname '*.jpeg' \
+         -o -iname '*.png' -o -iname '*.webp' \) \
+      -print0 | sort -z
+)
+
+if (( ${#WALLPAPERS[@]} == 0 )); then
+    echo "No wallpapers found in $DIR"
+    exit 1
+fi
+
+case "$ACTION" in
+    restore)
+        if [[ -s "$STATE" ]]; then
+            SELECTED=$(cat "$STATE")
+            if [[ ! -f "$SELECTED" ]]; then
+                SELECTED="${WALLPAPERS[0]}"
+            fi
+        else
+            SELECTED="${WALLPAPERS[0]}"
+        fi
+        ;;
+
+    next)
+        INDEX=0
+
+        if [[ -s "$STATE" ]]; then
+            CURRENT=$(cat "$STATE")
+
+            for i in "${!WALLPAPERS[@]}"; do
+                if [[ "${WALLPAPERS[$i]}" == "$CURRENT" ]]; then
+                    INDEX=$(( (i + 1) % ${#WALLPAPERS[@]} ))
+                    break
+                fi
+            done
+        fi
+
+        SELECTED="${WALLPAPERS[$INDEX]}"
+        ;;
+
+    random)
+        SELECTED="${WALLPAPERS[$(
+            shuf -i 0-$((${#WALLPAPERS[@]} - 1)) -n 1
+        )]}"
+        ;;
+
+    *)
+        echo "Usage: gntech-wallpaper {restore|next|random}"
+        exit 1
+        ;;
+esac
+
+if feh --bg-fill "$SELECTED"; then
+    printf '%s\n' "$SELECTED" > "$STATE"
+    echo "Wallpaper: $SELECTED"
+else
+    exit 1
+fi

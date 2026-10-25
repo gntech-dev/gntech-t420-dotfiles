@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+exec rofi \
+    -show drun \
+    -modi drun,run \
+    -show-icons \
+    -theme "$HOME/.config/rofi/gntech-launcher.rasi" \
+    -p "GNTECH"

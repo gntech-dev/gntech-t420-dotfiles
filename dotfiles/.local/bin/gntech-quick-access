@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+choice=$(
+  printf '%s\n' \
+    '󰋜  Home' \
+    '󰈙  Documents' \
+    '󰉍  Downloads' \
+    '󰉏  Pictures' \
+    '󰄀  Screenshots' \
+    '󰉋  Recent Folders' \
+    '󰈙  Recent Files' \
+    '󰕓  USB Drives' \
+    '󰖟  Network' |
+  rofi -dmenu \
+    -i \
+    -p 'GNTECH // FILES' \
+    -theme "$HOME/.config/rofi/gntech-files.rasi" \
+    -me-select-entry '' \
+    -me-accept-entry MousePrimary
+) || exit 0
+
+case "$choice" in
+  *Home)        "$HOME/.local/bin/gntech-open-folder" "$HOME" ;;
+  *Documents)   "$HOME/.local/bin/gntech-open-folder" "$(xdg-user-dir DOCUMENTS)" ;;
+  *Downloads)   "$HOME/.local/bin/gntech-open-folder" "$(xdg-user-dir DOWNLOAD)" ;;
+  *Pictures)    "$HOME/.local/bin/gntech-open-folder" "$(xdg-user-dir PICTURES)" ;;
+  *Screenshots) "$HOME/.local/bin/gntech-open-folder" "$HOME/Pictures/Screenshots" ;;
+  *"Recent Folders") "$HOME/.local/bin/gntech-recent-folders" ;;
+  *"Recent Files") "$HOME/.local/bin/gntech-recent-files" ;;
+  *"USB Drives") "$HOME/.local/bin/gntech-usb-menu" ;;
+  *Network)     thunar network:/// ;;
+esac

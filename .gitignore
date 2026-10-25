@@ -16,3 +16,9 @@
 .env
 .env.*
 !.env.example
+
+# GNTECH local configuration backups
+*.bak
+*.bak.*
+*.backup
+*.backup.*

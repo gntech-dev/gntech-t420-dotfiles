@@ -1,0 +1,29 @@
+[global]
+    monitor = 0
+    follow = none
+    width = 320
+    height = 120
+    origin = top-right
+    offset = (15, 45)
+
+    font = monospace 9
+    frame_width = 2
+    frame_color = "#00d9ff"
+    separator_color = frame
+    corner_radius = 6
+
+[urgency_low]
+    background = "#10141c"
+    foreground = "#d6deeb"
+    timeout = 4
+
+[urgency_normal]
+    background = "#10141c"
+    foreground = "#00d9ff"
+    timeout = 6
+
+[urgency_critical]
+    background = "#10141c"
+    foreground = "#ff5370"
+    frame_color = "#ff5370"
+    timeout = 0

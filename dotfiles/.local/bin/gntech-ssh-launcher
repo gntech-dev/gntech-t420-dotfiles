@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+THEME="$HOME/.config/rofi/gntech-files.rasi"
+
+mapfile -t hosts < <(
+    ssh -G dummy 2>/dev/null >/dev/null || true
+
+    awk '
+        tolower($1) == "host" {
+            for (i = 2; i <= NF; i++) {
+                if ($i !~ /[*?!]/ && $i !~ /^#/) {
+                    print $i
+                }
+            }
+        }
+    ' "$HOME/.ssh/config" | sort -u
+)
+
+if (( ${#hosts[@]} == 0 )); then
+    notify-send "GNTECH SSH" \
+        "No SSH hosts configured yet."
+    exit 0
+fi
+
+selection=$(
+    printf '%s\n' "${hosts[@]}" |
+    rofi -dmenu \
+        -i \
+        -p "GNTECH // SSH" \
+        -theme "$THEME" \
+        -me-select-entry '' \
+        -me-accept-entry MousePrimary
+) || exit 0
+
+[[ -n "$selection" ]] || exit 0
+
+for host in "${hosts[@]}"; do
+    if [[ "$selection" == "$host" ]]; then
+        exec alacritty \
+            --title "GNTECH SSH // $host" \
+            -e ssh "$host"
+    fi
+done

@@ -1,0 +1,103 @@
+configuration {
+    show-icons: false;
+    font: "JetBrainsMono Nerd Font 11";
+}
+
+* {
+    bg: #10141c;
+    bg-alt: #1c2635;
+    fg: #d6deeb;
+    cyan: #00d9ff;
+    selected-fg: #10141c;
+}
+
+window {
+    width: 360px;
+    background-color: @bg;
+    border: 2px;
+    border-color: @cyan;
+    border-radius: 8px;
+}
+
+mainbox {
+    padding: 15px;
+    spacing: 10px;
+    background-color: @bg;
+}
+
+inputbar {
+    children: [prompt];
+    padding: 10px;
+    background-color: @bg-alt;
+    border-radius: 5px;
+}
+
+prompt {
+    text-color: @cyan;
+}
+
+listview {
+    lines: 4;
+    spacing: 6px;
+    background-color: @bg;
+    scrollbar: false;
+}
+
+element {
+    padding: 12px;
+    background-color: @bg-alt;
+    border-radius: 5px;
+}
+
+element normal.normal {
+    background-color: @bg-alt;
+    text-color: @fg;
+}
+
+element selected.normal {
+    background-color: @cyan;
+    text-color: @selected-fg;
+}
+
+element-text {
+    background-color: inherit;
+    text-color: inherit;
+}
+
+element-icon {
+    background-color: inherit;
+}
+
+/* GNTECH - Consistent text colors */
+
+entry {
+    background-color: transparent;
+    text-color: #d6deeb;
+}
+
+prompt {
+    background-color: transparent;
+    text-color: #00d9ff;
+}
+
+element normal.normal,
+element alternate.normal {
+    background-color: #1c2635;
+}
+
+element selected.normal,
+element selected.active,
+element selected.urgent {
+    background-color: #00d9ff;
+}
+
+element-text normal.normal,
+element-text alternate.normal {
+    text-color: #d6deeb;
+}
+
+element-text selected.normal,
+element-text selected.active,
+element-text selected.urgent {
+    text-color: #10141c;
+}

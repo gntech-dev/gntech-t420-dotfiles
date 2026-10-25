@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+exec rofi \
+    -dmenu \
+    -theme "$HOME/.config/rofi/gntech-clipboard.rasi" \
+    -me-select-entry '' \
+    -me-accept-entry MousePrimary \
+    "$@"

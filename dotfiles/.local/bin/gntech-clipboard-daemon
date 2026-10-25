@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+export CM_LAUNCHER=rofi
+export CM_MAX_CLIPS=100
+export CM_SELECTIONS=clipboard
+
+pgrep -u "$UID" -x clipmenud >/dev/null && exit 0
+
+exec clipmenud

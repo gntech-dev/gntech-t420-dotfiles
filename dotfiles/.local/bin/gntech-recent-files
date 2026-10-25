@@ -1,0 +1,109 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import subprocess
+import urllib.parse
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+HOME = Path.home()
+HISTORY = HOME / ".local/share/recently-used.xbel"
+THEME = HOME / ".config/rofi/gntech-files.rasi"
+
+if not HISTORY.exists():
+    subprocess.run([
+        "notify-send", "GNTECH Recent Files",
+        "No GTK recent-file history found yet."
+    ])
+    sys.exit(0)
+
+try:
+    tree = ET.parse(HISTORY)
+except ET.ParseError:
+    subprocess.run([
+        "notify-send", "GNTECH Recent Files",
+        "Unable to read GTK recent-file history."
+    ])
+    sys.exit(1)
+
+ns = {"x": "http://www.xbel.org/namespace"}
+
+items = []
+
+for bookmark in tree.getroot().iter("bookmark"):
+    uri = bookmark.get("href", "")
+
+    if not uri.startswith("file://"):
+        continue
+
+    parsed = urllib.parse.urlparse(uri)
+
+    if parsed.netloc not in ("", "localhost"):
+        continue
+
+    path = Path(urllib.parse.unquote(parsed.path))
+
+    if not path.is_file():
+        continue
+
+    modified = bookmark.get("modified", "")
+
+    items.append((modified, path))
+
+items.sort(key=lambda item: item[0], reverse=True)
+
+# Remove duplicate paths while preserving recent order.
+seen = set()
+recent = []
+
+for _, path in items:
+    if path in seen:
+        continue
+
+    seen.add(path)
+    recent.append(path)
+
+    if len(recent) >= 20:
+        break
+
+if not recent:
+    subprocess.run([
+        "notify-send", "GNTECH Recent Files",
+        "No recent local files available."
+    ])
+    sys.exit(0)
+
+labels = [
+    f"󰈙  {path.name}  —  {path.parent}"
+    for path in recent
+]
+
+result = subprocess.run(
+    [
+        "rofi", "-dmenu", "-i",
+        "-p", "GNTECH // RECENT",
+        "-theme", str(THEME),
+        "-format", "i",
+        "-me-select-entry", "",
+        "-me-accept-entry", "MousePrimary"
+    ],
+    input="\n".join(labels),
+    text=True,
+    capture_output=True
+)
+
+if result.returncode != 0:
+    sys.exit(0)
+
+try:
+    index = int(result.stdout.strip())
+    selected = recent[index]
+except (ValueError, IndexError):
+    sys.exit(1)
+
+subprocess.Popen(
+    ["xdg-open", str(selected)],
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL
+)

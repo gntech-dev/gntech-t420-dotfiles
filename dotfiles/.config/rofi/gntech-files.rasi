@@ -1,0 +1,82 @@
+configuration {
+    show-icons: false;
+}
+
+* {
+    bg: #10141c;
+    bg-alt: #202936;
+    fg: #e5ecf6;
+    muted: #8290a4;
+    cyan: #00d9ff;
+    purple: #c792ea;
+    selected: #224353;
+
+    background-color: transparent;
+    text-color: @fg;
+    font: "JetBrainsMono Nerd Font 11";
+}
+
+window {
+    width: 520px;
+    location: center;
+    anchor: center;
+    border: 2px;
+    border-color: @cyan;
+    border-radius: 12px;
+    background-color: @bg;
+    padding: 14px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing: 12px;
+}
+
+inputbar {
+    children: [ prompt, entry ];
+    background-color: @bg-alt;
+    border-radius: 8px;
+    padding: 12px;
+    spacing: 10px;
+}
+
+prompt {
+    text-color: @cyan;
+}
+
+entry {
+    text-color: @fg;
+    placeholder: "Search locations...";
+    placeholder-color: @muted;
+}
+
+listview {
+    lines: 8;
+    columns: 1;
+    fixed-height: true;
+    scrollbar: false;
+    spacing: 5px;
+}
+
+element {
+    padding: 10px;
+    border-radius: 7px;
+    background-color: transparent;
+}
+
+element-text {
+    text-color: @fg;
+    background-color: transparent;
+}
+
+element selected {
+    background-color: @selected;
+}
+
+element selected.normal {
+    background-color: @selected;
+}
+
+element-text selected {
+    text-color: @cyan;
+}

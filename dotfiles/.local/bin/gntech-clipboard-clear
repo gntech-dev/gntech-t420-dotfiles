@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+choice=$(
+  printf 'Cancel\nClear clipboard history\n' |
+  "$HOME/.local/bin/gntech-rofi-clipboard" \
+    -p "GNTECH // Clipboard"
+) || exit 0
+
+[[ "$choice" == "Clear clipboard history" ]] || exit 0
+
+# Find the runtime directory used by the running daemon.
+pid=$(pgrep -u "$(id -u)" -xo clipmenud || true)
+base="${CM_DIR:-${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}}"
+
+if [[ -n "$pid" && -r "/proc/$pid/environ" ]]; then
+  daemon_dir=$(
+    tr '\0' '\n' < "/proc/$pid/environ" |
+      sed -n 's/^CM_DIR=//p' | head -1
+  )
+  [[ -z "$daemon_dir" ]] || base="$daemon_dir"
+fi
+
+history="$base/clipmenu.6.$USER"
+
+# Safety: operate only on the expected clipmenu directory.
+[[ "$(basename "$history")" == "clipmenu.6.$USER" ]] || exit 1
+
+# Stop clipboard monitoring before clearing.
+pkill -u "$(id -u)" -x clipmenud || true
+sleep 0.5
+
+# Empty the current clipboard before restarting monitoring.
+xclip -selection clipboard -i /dev/null 2>/dev/null || true
+
+if [[ -d "$history" ]]; then
+  find "$history" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+fi
+
+# Restart using your existing GNTECH configuration.
+"$HOME/.local/bin/gntech-clipboard-daemon" \
+  >> "$HOME/.cache/gntech-clipboard.log" 2>&1 &
+
+notify-send "GNTECH Clipboard" "Clipboard history cleared"

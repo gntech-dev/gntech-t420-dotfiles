@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Prevent duplicate lock screens
+pgrep -x i3lock >/dev/null && exit 0
+
+exec i3lock -c 10141c

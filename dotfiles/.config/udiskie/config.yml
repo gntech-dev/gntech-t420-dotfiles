@@ -1,0 +1,11 @@
+program_options:
+  automount: true
+  notify: true
+  tray: false
+  file_manager: thunar
+
+notifications:
+  device_mounted: 5
+  device_unmounted: 5
+  device_added: 5
+  device_removed: 5

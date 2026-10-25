@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+BAT="/sys/class/power_supply/BAT0"
+STATE="$HOME/.cache/gntech-battery/last-level"
+
+[[ -r "$BAT/capacity" && -r "$BAT/status" ]] || exit 0
+
+CAPACITY=$(<"$BAT/capacity")
+STATUS=$(<"$BAT/status")
+
+if [[ "$STATUS" != "Discharging" ]] || (( CAPACITY > 25 )); then
+    rm -f "$STATE"
+    exit 0
+fi
+
+if (( CAPACITY <= 5 )); then
+    LEVEL=5
+elif (( CAPACITY <= 10 )); then
+    LEVEL=10
+elif (( CAPACITY <= 15 )); then
+    LEVEL=15
+else
+    LEVEL=25
+fi
+
+LAST=100
+[[ -r "$STATE" ]] && read -r LAST < "$STATE"
+
+# Notify when entering a lower battery warning band
+if (( LEVEL >= LAST )); then
+    exit 0
+fi
+
+printf '%s\n' "$LEVEL" > "$STATE"
+
+case "$LEVEL" in
+    25)
+        notify-send -u normal \
+          "GNTECH Battery" \
+          "Battery ${CAPACITY}% — Consider charging."
+        ;;
+    15)
+        notify-send -u critical \
+          "GNTECH Low Battery" \
+          "Battery ${CAPACITY}% — Connect charger soon."
+        ;;
+    10)
+        notify-send -u critical \
+          "GNTECH Critical Battery" \
+          "Battery ${CAPACITY}% — Save your work."
+        ;;
+    5)
+        notify-send -u critical \
+          "GNTECH Emergency Battery" \
+          "Battery ${CAPACITY}% — Connect charger immediately."
+        ;;
+esac
